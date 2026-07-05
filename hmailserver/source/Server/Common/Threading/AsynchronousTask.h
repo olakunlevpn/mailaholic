@@ -1,0 +1,43 @@
+// Copyright (c) 2025 Mailaholic contributors (based on hMailServer).
+// https://github.com/olakunlevpn/mailaholic
+
+#pragma once
+
+#include "Task.h"
+
+namespace MA
+{
+   template <class T>
+   class AsynchronousTask : public Task
+   {
+   public:
+      AsynchronousTask(std::function<void()> functionToRun, std::shared_ptr<T> parentHolder) :
+         Task("AsynchronousTask"),
+         asynchronousFunction_(functionToRun),
+         parentHolder_(parentHolder)
+      {
+
+      }
+
+      virtual void DoWork()
+      {
+         try
+         {
+            asynchronousFunction_();
+         }
+         catch (...)
+         {
+            // to be sure we release our pointer to the parent TCP connection below.
+         }
+
+         // Reset the shared_ptr to the parent object.
+         parentHolder_.reset();
+      }
+
+   private:
+
+      std::function<void()> asynchronousFunction_;
+
+      std::shared_ptr<T> parentHolder_;
+   };
+}

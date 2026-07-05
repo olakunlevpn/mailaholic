@@ -1,0 +1,24 @@
+HKCR
+{
+	Mailaholic.DistributionListRecipient.1 = s 'DistributionListRecipient Class'
+	{
+		CLSID = s '{0886D5D8-4C1C-46F1-BC7B-EEDC9FE9DFFA}'
+	}
+	Mailaholic.DistributionListRecipient = s 'DistributionListRecipient Class'
+	{
+		CLSID = s '{0886D5D8-4C1C-46F1-BC7B-EEDC9FE9DFFA}'
+		CurVer = s 'Mailaholic.DistributionListRecipient.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {0886D5D8-4C1C-46F1-BC7B-EEDC9FE9DFFA} = s 'DistributionListRecipient Class'
+		{
+			ProgID = s 'Mailaholic.DistributionListRecipient.1'
+			VersionIndependentProgID = s 'Mailaholic.DistributionListRecipient'
+			ForceRemove 'Programmable'
+			LocalServer32 = s '%MODULE%'
+			val AppID = s '%APPID%'
+			'TypeLib' = s '{DB241B59-A1B1-4C59-98FC-8D101A2995F2}'
+		}
+	}
+}

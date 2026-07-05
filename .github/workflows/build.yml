@@ -1,0 +1,269 @@
+name: build
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+env:
+  MailaholicLibs: C:\MailaholicLibs
+  VCVARS: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat
+
+jobs:
+  server:
+    runs-on: windows-2022
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create libs directory
+        shell: cmd
+        run: if not exist C:\MailaholicLibs mkdir C:\MailaholicLibs
+
+      - name: Cache OpenSSL
+        id: cache-openssl
+        uses: actions/cache@v4
+        with:
+          path: C:\MailaholicLibs\openssl-3.5.5\out64
+          key: openssl-3.5.5-vs2022-x64-v2
+
+      - name: Build OpenSSL
+        if: steps.cache-openssl.outputs.cache-hit != 'true'
+        shell: cmd
+        run: |
+          curl -sSLf -o %TEMP%\openssl.tar.gz https://github.com/openssl/openssl/releases/download/openssl-3.5.5/openssl-3.5.5.tar.gz
+          if errorlevel 1 exit /b 1
+          tar -xzf %TEMP%\openssl.tar.gz -C C:\MailaholicLibs
+          if errorlevel 1 exit /b 1
+          call "%VCVARS%"
+          cd /d C:\MailaholicLibs\openssl-3.5.5
+          perl Configure no-asm VC-WIN64A --prefix=%CD%\out64 --openssldir=%CD%\out64 -D_WIN32_WINNT=0x600
+          if errorlevel 1 exit /b 1
+          nmake
+          if errorlevel 1 exit /b 1
+          nmake install_sw
+
+      - name: Cache Boost
+        id: cache-boost
+        uses: actions/cache@v4
+        with:
+          path: |
+            C:\MailaholicLibs\boost_1_90_0\boost
+            C:\MailaholicLibs\boost_1_90_0\stage\lib
+          key: boost-1.90.0-vs2022-x64-static-v1
+
+      - name: Build Boost
+        if: steps.cache-boost.outputs.cache-hit != 'true'
+        shell: cmd
+        run: |
+          curl -sSLf -o %TEMP%\boost.tar.gz https://archives.boost.io/release/1.90.0/source/boost_1_90_0.tar.gz
+          if errorlevel 1 exit /b 1
+          tar -xzf %TEMP%\boost.tar.gz -C C:\MailaholicLibs
+          if errorlevel 1 exit /b 1
+          call "%VCVARS%"
+          cd /d C:\MailaholicLibs\boost_1_90_0
+          call bootstrap.bat
+          if errorlevel 1 exit /b 1
+          b2 debug release threading=multi link=static --with-thread --with-filesystem --with-regex --with-chrono --with-system --with-atomic --toolset=msvc-14.3 address-model=64 stage --build-dir=out64 -j %NUMBER_OF_PROCESSORS%
+          if errorlevel 1 exit /b 1
+
+      - name: Cache libpq
+        id: cache-libpq
+        uses: actions/cache@v4
+        with:
+          path: |
+            C:\MailaholicLibs\postgresql-15.18\src\include
+            C:\MailaholicLibs\postgresql-15.18\src\interfaces\libpq
+            C:\MailaholicLibs\postgresql-15.18\Release\libpq
+          key: libpq-15.18-vs2022-x64-v1
+
+      - name: Build libpq
+        if: steps.cache-libpq.outputs.cache-hit != 'true'
+        shell: cmd
+        run: |
+          curl -sSLf -o %TEMP%\postgresql.tar.gz https://ftp.postgresql.org/pub/source/v15.18/postgresql-15.18.tar.gz
+          if errorlevel 1 exit /b 1
+          tar -xzf %TEMP%\postgresql.tar.gz -C C:\MailaholicLibs
+          if errorlevel 1 exit /b 1
+          call "%VCVARS%"
+          cd /d C:\MailaholicLibs\postgresql-15.18\src\tools\msvc
+          perl build.pl Release libpq
+          if errorlevel 1 exit /b 1
+
+      - name: Build Mailaholic
+        shell: pwsh
+        run: ./build/build.ps1 -Configuration Release
+
+      - name: Stage runtime DLLs
+        shell: cmd
+        run: |
+          copy /Y C:\MailaholicLibs\openssl-3.5.5\out64\bin\libcrypto-3-x64.dll hmailserver\source\Server\Mailaholic\x64\Release\
+          if errorlevel 1 exit /b 1
+          copy /Y C:\MailaholicLibs\openssl-3.5.5\out64\bin\libssl-3-x64.dll hmailserver\source\Server\Mailaholic\x64\Release\
+          if errorlevel 1 exit /b 1
+          copy /Y C:\MailaholicLibs\postgresql-15.18\Release\libpq\libpq.dll hmailserver\source\Server\Mailaholic\x64\Release\
+          if errorlevel 1 exit /b 1
+
+      - name: Run self-tests
+        shell: cmd
+        run: hmailserver\source\Server\Mailaholic\x64\Release\Mailaholic.exe /SelfTest
+
+      - name: Upload server binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: Mailaholic-server
+          path: |
+            hmailserver/source/Server/Mailaholic/x64/Release/Mailaholic.exe
+            hmailserver/source/Server/Mailaholic/x64/Release/Mailaholic.Minidump.exe
+            hmailserver/source/Server/Mailaholic/x64/Release/libcrypto-3-x64.dll
+            hmailserver/source/Server/Mailaholic/x64/Release/libssl-3-x64.dll
+            hmailserver/source/Server/Mailaholic/x64/Release/libpq.dll
+
+      - name: Find and upload type library
+        shell: pwsh
+        run: |
+          $tlb = Get-ChildItem -Path hmailserver -Recurse -Filter "hMailServer.tlb" | Select-Object -First 1
+          if (-not $tlb) { Write-Error "hMailServer.tlb not found"; exit 1 }
+          Write-Host "Found tlb at: $($tlb.FullName)"
+          Copy-Item $tlb.FullName -Destination hmailserver/source/Server/Mailaholic/x64/Release/
+
+      - name: Upload type library
+        uses: actions/upload-artifact@v4
+        with:
+          name: Mailaholic-tlb
+          path: hmailserver/source/Server/Mailaholic/x64/Release/hMailServer.tlb
+
+  tools:
+    runs-on: windows-2022
+    needs: server
+    env:
+      VCVARS: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download type library
+        uses: actions/download-artifact@v4
+        with:
+          name: Mailaholic-tlb
+          path: hmailserver/source/Server/Mailaholic/x64/Release
+
+      - name: Generate COM interop assembly
+        shell: cmd
+        run: |
+          call "%VCVARS%"
+          tlbimp hmailserver\source\Server\Mailaholic\x64\Release\hMailServer.tlb /out:hmailserver\source\Tools\Interop.hMailServer.dll /namespace:hMailServer
+          if errorlevel 1 exit /b 1
+          dir hmailserver\source\Tools\Interop.hMailServer.dll
+          echo Interop assembly generated successfully
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Build Administrator
+        shell: cmd
+        run: |
+          msbuild hmailserver\source\Tools\Administrator\Administrator.csproj /p:Configuration=Release /p:Platform=x64 /p:ResolveComReferenceSilent=true
+          if errorlevel 1 exit /b 1
+
+      - name: Build DBSetup
+        shell: cmd
+        run: |
+          msbuild hmailserver\source\Tools\DBSetup\DBSetup.csproj /p:Configuration=Release /p:Platform=x64 /p:ResolveComReferenceSilent=true
+          if errorlevel 1 exit /b 1
+
+      - name: Build DBUpdater
+        shell: cmd
+        run: |
+          msbuild hmailserver\source\Tools\DBUpdater\DBUpdater.csproj /p:Configuration=Release /p:Platform=x64 /p:ResolveComReferenceSilent=true
+          if errorlevel 1 exit /b 1
+
+      - name: Build DBSetupQuick
+        shell: cmd
+        run: |
+          msbuild hmailserver\source\Tools\DBSetupQuick\DBSetupQuick.csproj /p:Configuration=Release /p:Platform=x64 /p:ResolveComReferenceSilent=true
+          if errorlevel 1 exit /b 1
+
+      - name: Build DataDirectorySynchronizer
+        shell: cmd
+        run: |
+          msbuild hmailserver\source\Tools\DataDirectorySynchronizer\DataDirectorySynchronizer.csproj /p:Configuration=Release /p:Platform=x64 /p:ResolveComReferenceSilent=true
+          if errorlevel 1 exit /b 1
+
+      - name: Upload tools
+        uses: actions/upload-artifact@v4
+        with:
+          name: Mailaholic-tools
+          path: |
+            hmailserver/source/Tools/Administrator/bin/x64/Release/*.exe
+            hmailserver/source/Tools/Administrator/bin/x64/Release/*.dll
+            hmailserver/source/Tools/DBSetup/bin/x64/Release/*.exe
+            hmailserver/source/Tools/DBUpdater/bin/x64/Release/*.exe
+            hmailserver/source/Tools/DBSetupQuick/bin/x64/Release/*.exe
+            hmailserver/source/Tools/DataDirectorySynchronizer/bin/x64/Release/*.exe
+            hmailserver/source/Tools/Shared/bin/x64/Release/*.dll
+
+  installer:
+    runs-on: windows-2022
+    needs: [server, tools]
+    env:
+      MailaholicLibs: C:\MailaholicLibs
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download server artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: Mailaholic-server
+          path: hmailserver/source/Server/Mailaholic/x64/Release
+
+      - name: Download tools artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: Mailaholic-tools
+          path: tools-staging
+
+      - name: Stage tools to expected paths
+        shell: cmd
+        run: |
+          xcopy tools-staging\Administrator\bin\x64\Release\* hmailserver\source\Tools\Administrator\bin\x64\Release\ /E /I /Y
+          xcopy tools-staging\DBSetup\bin\x64\Release\* hmailserver\source\Tools\DBSetup\bin\x64\Release\ /E /I /Y
+          xcopy tools-staging\DBUpdater\bin\x64\Release\* hmailserver\source\Tools\DBUpdater\bin\x64\Release\ /E /I /Y
+          xcopy tools-staging\DBSetupQuick\bin\x64\Release\* hmailserver\source\Tools\DBSetupQuick\bin\x64\Release\ /E /I /Y
+          xcopy tools-staging\DataDirectorySynchronizer\bin\x64\Release\* hmailserver\source\Tools\DataDirectorySynchronizer\bin\x64\Release\ /E /I /Y
+          xcopy tools-staging\Shared\bin\x64\Release\* hmailserver\source\Tools\Shared\bin\x64\Release\ /E /I /Y
+          dir hmailserver\source\Tools\Administrator\bin\x64\Release\
+          dir hmailserver\source\Tools\DBSetup\bin\x64\Release\
+          dir hmailserver\source\Tools\DBUpdater\bin\x64\Release\
+
+      - name: Download type library
+        uses: actions/download-artifact@v4
+        with:
+          name: Mailaholic-tlb
+          path: hmailserver/source/Server/Mailaholic/x64/Release
+
+      - name: Setup libs directory
+        shell: cmd
+        run: |
+          mkdir C:\MailaholicLibs\openssl-3.5.5\out64\bin
+          mkdir C:\MailaholicLibs\postgresql-15.18\Release\libpq
+          copy hmailserver\source\Server\Mailaholic\x64\Release\libcrypto-3-x64.dll C:\MailaholicLibs\openssl-3.5.5\out64\bin\
+          copy hmailserver\source\Server\Mailaholic\x64\Release\libssl-3-x64.dll C:\MailaholicLibs\openssl-3.5.5\out64\bin\
+          copy hmailserver\source\Server\Mailaholic\x64\Release\libpq.dll C:\MailaholicLibs\postgresql-15.18\Release\libpq\
+
+      - name: Install InnoSetup
+        shell: pwsh
+        run: |
+          choco install innosetup -y --no-progress
+          echo "C:\Program Files (x86)\Inno Setup 6" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Compile installer
+        shell: cmd
+        run: |
+          "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" hmailserver\installation\Mailaholic64.iss
+          if errorlevel 1 exit /b 1
+
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: Mailaholic-installer
+          path: hmailserver/installation/Output/*.exe

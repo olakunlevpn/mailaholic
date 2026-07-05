@@ -1,0 +1,48 @@
+// Copyright (c) 2025 Mailaholic contributors (based on hMailServer).
+// https://github.com/olakunlevpn/mailaholic
+
+#include "StdAfx.h"
+
+#include "TCPConnectionFactory.h"
+
+#include "../../SMTP/SMTPConnection.h"
+#include "../../POP3/POP3Connection.h"
+#include "../../IMAP/IMAPConnection.h"
+
+#ifdef _DEBUG
+#define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
+#define new DEBUG_NEW
+#endif
+
+namespace MA
+{
+   std::shared_ptr<TCPConnection>
+   SMTPConnectionFactory::Create(ConnectionSecurity connection_security,
+                                    boost::asio::io_context& io_context, 
+                                    boost::asio::ssl::context& context)
+   {
+      SMTPConnection* smtpConn = new SMTPConnection(connection_security, io_context, context);
+
+      return std::shared_ptr<TCPConnection>(smtpConn);
+   }
+
+   std::shared_ptr<TCPConnection>
+   POP3ConnectionFactory::Create(ConnectionSecurity connection_security,
+      boost::asio::io_context& io_context, 
+      boost::asio::ssl::context& context)
+   {
+      POP3Connection* smtpConn = new POP3Connection(connection_security, io_context, context);
+
+      return std::shared_ptr<TCPConnection>(smtpConn);
+   }
+
+   std::shared_ptr<TCPConnection>
+   IMAPConnectionFactory::Create(ConnectionSecurity connection_security,
+      boost::asio::io_context& io_context, 
+      boost::asio::ssl::context& context)
+   {
+      IMAPConnection* smtpConn = new IMAPConnection(connection_security, io_context, context);
+
+      return std::shared_ptr<TCPConnection>(smtpConn);
+   }
+}

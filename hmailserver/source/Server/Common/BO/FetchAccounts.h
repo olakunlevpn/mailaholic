@@ -1,0 +1,32 @@
+// Copyright (c) 2025 Mailaholic contributors (based on hMailServer).
+// https://github.com/olakunlevpn/mailaholic
+
+#pragma once
+#include "Collection.h"
+
+#include "../Persistence/PersistentFetchAccount.h"
+#include "FetchAccount.h"
+
+namespace MA
+{
+   class FetchAccounts : public Collection<FetchAccount, PersistentFetchAccount>
+   {
+   public:
+      FetchAccounts(__int64 iAccountID);
+      ~FetchAccounts(void);
+
+      void RefreshPendingList();
+      
+      void Refresh();
+
+      __int64 GetAccountID () {return account_id_; }
+
+   protected:
+      virtual bool PreSaveObject(std::shared_ptr<FetchAccount> pFA, XNode *node);
+      virtual String GetCollectionName() const {return "FetchAccounts"; }
+   private:
+
+      __int64 account_id_;
+   };
+
+}

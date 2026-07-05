@@ -1,0 +1,24 @@
+HKCR
+{
+	Mailaholic.ServerMessages.1 = s 'ServerMessages Class'
+	{
+		CLSID = s '{379F1428-A4C9-4D43-9745-AEABF8950755}'
+	}
+	Mailaholic.ServerMessages = s 'ServerMessages Class'
+	{
+		CLSID = s '{379F1428-A4C9-4D43-9745-AEABF8950755}'
+		CurVer = s 'Mailaholic.ServerMessages.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {379F1428-A4C9-4D43-9745-AEABF8950755} = s 'ServerMessages Class'
+		{
+			ProgID = s 'Mailaholic.ServerMessages.1'
+			VersionIndependentProgID = s 'Mailaholic.ServerMessages'
+			ForceRemove 'Programmable'
+			LocalServer32 = s '%MODULE%'
+			val AppID = s '%APPID%'
+			'TypeLib' = s '{DB241B59-A1B1-4C59-98FC-8D101A2995F2}'
+		}
+	}
+}

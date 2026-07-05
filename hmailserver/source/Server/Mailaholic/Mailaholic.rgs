@@ -1,0 +1,11 @@
+HKCR
+{
+	NoRemove AppID
+	{
+		'%APPID%' = s 'Mailaholic'
+		'Mailaholic.EXE'
+		{
+			val AppID = s '%APPID%'
+		}
+	}
+}

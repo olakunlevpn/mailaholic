@@ -1,0 +1,26 @@
+HKCR
+{
+	Mailaholic.DiagnosticResult.1 = s 'DiagnosticResult Class'
+	{
+		CLSID = s '{430C3328-6348-4A86-8E12-74B5B5EFF48D}'
+	}
+	Mailaholic.DiagnosticResult = s 'DiagnosticResult Class'
+	{
+		CLSID = s '{430C3328-6348-4A86-8E12-74B5B5EFF48D}'
+		CurVer = s 'Mailaholic.DiagnosticResult.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {430C3328-6348-4A86-8E12-74B5B5EFF48D} = s 'DiagnosticResult Class'
+		{
+			ProgID = s 'Mailaholic.DiagnosticResult.1'
+			VersionIndependentProgID = s 'Mailaholic.DiagnosticResult'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Apartment'
+			}
+			'TypeLib' = s '{E89A9B6A-8310-4AA4-865D-FADA515A82FC}'
+		}
+	}
+}

@@ -1,0 +1,43 @@
+// Copyright (c) 2025 Mailaholic contributors (based on hMailServer).
+// https://github.com/olakunlevpn/mailaholic
+
+#include "StdAfx.h"
+#include ".\result.h"
+
+#ifdef _DEBUG
+#define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
+#define new DEBUG_NEW
+#endif
+
+
+namespace MA
+{
+   Result::Result(void) :
+      parameter_(0),
+      value_(0)
+   {
+      
+   }
+
+   Result::~Result(void)
+   {
+   }
+
+   long
+   Result::GetValue() const 
+   {
+      return value_;
+   }
+
+   int
+   Result::GetParameter() const 
+   {
+      return parameter_;
+   }
+
+   String
+   Result::GetMessage() const
+   {
+      return message_;
+   }
+}

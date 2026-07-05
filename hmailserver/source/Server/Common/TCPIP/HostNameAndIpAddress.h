@@ -1,0 +1,26 @@
+// Copyright (c) 2025 Mailaholic contributors (based on hMailServer).
+// https://github.com/olakunlevpn/mailaholic
+
+#pragma once
+
+namespace MA
+{
+   class HostNameAndIpAddress
+   {
+   public:
+   
+      void SetHostName(const String &host_name) {host_name_ = host_name;}
+      void SetIpAddress(const String &ip_address) {ip_address_ = ip_address;}
+
+      String GetHostName() {return host_name_;}
+      String GetIpAddress() {return ip_address_; }
+
+   private:
+      
+      String host_name_;
+      String ip_address_;
+
+   };
+
+
+}

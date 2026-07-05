@@ -1,0 +1,47 @@
+// Copyright (c) 2025 Mailaholic contributors (based on hMailServer).
+// https://github.com/olakunlevpn/mailaholic
+
+#include "stdafx.h"
+#include "distributionlistrecipient.h"
+
+#ifdef _DEBUG
+#define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
+#define new DEBUG_NEW
+#endif
+
+namespace MA
+{
+   DistributionListRecipient::DistributionListRecipient(void) :
+      list_id_(0)
+   {
+
+   }
+
+   DistributionListRecipient::~DistributionListRecipient(void)
+   {
+   }
+
+   void
+   DistributionListRecipient::SetAddress(const String & sAddress)
+   {
+      address_ = sAddress;
+   }
+
+   bool 
+   DistributionListRecipient::XMLStore(XNode *pParentNode, int iOptions)
+   {
+      XNode *pNode = pParentNode->AppendChild(_T("Recipient"));
+
+      pNode->AppendAttr(_T("Name"), address_);
+
+      return true;
+   }
+
+   bool 
+   DistributionListRecipient::XMLLoad(XNode *pNode, int iOptions)
+   {
+      address_ = pNode->GetAttrValue(_T("Name"));
+
+      return true;
+   }
+}

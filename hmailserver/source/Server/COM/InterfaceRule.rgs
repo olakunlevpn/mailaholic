@@ -1,0 +1,24 @@
+HKCR
+{
+	Mailaholic.Rule.1 = s 'Rule Class'
+	{
+		CLSID = s '{D5D7927A-7D05-40F3-91DD-968FC14316C7}'
+	}
+	Mailaholic.Rule = s 'Rule Class'
+	{
+		CLSID = s '{D5D7927A-7D05-40F3-91DD-968FC14316C7}'
+		CurVer = s 'Mailaholic.Rule.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {D5D7927A-7D05-40F3-91DD-968FC14316C7} = s 'Rule Class'
+		{
+			ProgID = s 'Mailaholic.Rule.1'
+			VersionIndependentProgID = s 'Mailaholic.Rule'
+			ForceRemove 'Programmable'
+			LocalServer32 = s '%MODULE%'
+			val AppID = s '%APPID%'
+			'TypeLib' = s '{DB241B59-A1B1-4C59-98FC-8D101A2995F2}'
+		}
+	}
+}
