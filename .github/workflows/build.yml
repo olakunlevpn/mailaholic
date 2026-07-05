@@ -156,37 +156,23 @@ jobs:
           dir hmailserver\source\Tools\Interop.hMailServer.dll
           echo Interop assembly generated successfully
 
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v2
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
 
-      - name: Build Administrator
+      - name: Build all tools
         shell: cmd
         run: |
-          msbuild hmailserver\source\Tools\Administrator\Administrator.csproj /p:Configuration=Release /p:Platform=x64 /p:ResolveComReferenceSilent=true
+          dotnet build hmailserver\source\Tools\Administrator\Administrator.csproj -c Release
           if errorlevel 1 exit /b 1
-
-      - name: Build DBSetup
-        shell: cmd
-        run: |
-          msbuild hmailserver\source\Tools\DBSetup\DBSetup.csproj /p:Configuration=Release /p:Platform=x64 /p:ResolveComReferenceSilent=true
+          dotnet build hmailserver\source\Tools\DBSetup\DBSetup.csproj -c Release
           if errorlevel 1 exit /b 1
-
-      - name: Build DBUpdater
-        shell: cmd
-        run: |
-          msbuild hmailserver\source\Tools\DBUpdater\DBUpdater.csproj /p:Configuration=Release /p:Platform=x64 /p:ResolveComReferenceSilent=true
+          dotnet build hmailserver\source\Tools\DBUpdater\DBUpdater.csproj -c Release
           if errorlevel 1 exit /b 1
-
-      - name: Build DBSetupQuick
-        shell: cmd
-        run: |
-          msbuild hmailserver\source\Tools\DBSetupQuick\DBSetupQuick.csproj /p:Configuration=Release /p:Platform=x64 /p:ResolveComReferenceSilent=true
+          dotnet build hmailserver\source\Tools\DBSetupQuick\DBSetupQuick.csproj -c Release
           if errorlevel 1 exit /b 1
-
-      - name: Build DataDirectorySynchronizer
-        shell: cmd
-        run: |
-          msbuild hmailserver\source\Tools\DataDirectorySynchronizer\DataDirectorySynchronizer.csproj /p:Configuration=Release /p:Platform=x64 /p:ResolveComReferenceSilent=true
+          dotnet build hmailserver\source\Tools\DataDirectorySynchronizer\DataDirectorySynchronizer.csproj -c Release
           if errorlevel 1 exit /b 1
 
       - name: Upload tools
@@ -194,13 +180,12 @@ jobs:
         with:
           name: Mailaholic-tools
           path: |
-            hmailserver/source/Tools/Administrator/bin/x64/Release/*.exe
-            hmailserver/source/Tools/Administrator/bin/x64/Release/*.dll
-            hmailserver/source/Tools/DBSetup/bin/x64/Release/*.exe
-            hmailserver/source/Tools/DBUpdater/bin/x64/Release/*.exe
-            hmailserver/source/Tools/DBSetupQuick/bin/x64/Release/*.exe
-            hmailserver/source/Tools/DataDirectorySynchronizer/bin/x64/Release/*.exe
-            hmailserver/source/Tools/Shared/bin/x64/Release/*.dll
+            hmailserver/source/Tools/Administrator/bin/Release/net8.0-windows/*
+            hmailserver/source/Tools/DBSetup/bin/Release/net8.0-windows/*
+            hmailserver/source/Tools/DBUpdater/bin/Release/net8.0-windows/*
+            hmailserver/source/Tools/DBSetupQuick/bin/Release/net8.0-windows/*
+            hmailserver/source/Tools/DataDirectorySynchronizer/bin/Release/net8.0-windows/*
+            hmailserver/source/Tools/Shared/bin/Release/net8.0-windows/*
 
   installer:
     runs-on: windows-2022
@@ -225,12 +210,12 @@ jobs:
       - name: Stage tools to expected paths
         shell: cmd
         run: |
-          xcopy tools-staging\Administrator\bin\x64\Release\* hmailserver\source\Tools\Administrator\bin\x64\Release\ /E /I /Y
-          xcopy tools-staging\DBSetup\bin\x64\Release\* hmailserver\source\Tools\DBSetup\bin\x64\Release\ /E /I /Y
-          xcopy tools-staging\DBUpdater\bin\x64\Release\* hmailserver\source\Tools\DBUpdater\bin\x64\Release\ /E /I /Y
-          xcopy tools-staging\DBSetupQuick\bin\x64\Release\* hmailserver\source\Tools\DBSetupQuick\bin\x64\Release\ /E /I /Y
-          xcopy tools-staging\DataDirectorySynchronizer\bin\x64\Release\* hmailserver\source\Tools\DataDirectorySynchronizer\bin\x64\Release\ /E /I /Y
-          xcopy tools-staging\Shared\bin\x64\Release\* hmailserver\source\Tools\Shared\bin\x64\Release\ /E /I /Y
+          xcopy tools-staging\Administrator\bin\Release\net8.0-windows\* hmailserver\source\Tools\Administrator\bin\x64\Release\ /E /I /Y
+          xcopy tools-staging\DBSetup\bin\Release\net8.0-windows\* hmailserver\source\Tools\DBSetup\bin\x64\Release\ /E /I /Y
+          xcopy tools-staging\DBUpdater\bin\Release\net8.0-windows\* hmailserver\source\Tools\DBUpdater\bin\x64\Release\ /E /I /Y
+          xcopy tools-staging\DBSetupQuick\bin\Release\net8.0-windows\* hmailserver\source\Tools\DBSetupQuick\bin\x64\Release\ /E /I /Y
+          xcopy tools-staging\DataDirectorySynchronizer\bin\Release\net8.0-windows\* hmailserver\source\Tools\DataDirectorySynchronizer\bin\x64\Release\ /E /I /Y
+          xcopy tools-staging\Shared\bin\Release\net8.0-windows\* hmailserver\source\Tools\Shared\bin\x64\Release\ /E /I /Y
           dir hmailserver\source\Tools\Administrator\bin\x64\Release\
           dir hmailserver\source\Tools\DBSetup\bin\x64\Release\
           dir hmailserver\source\Tools\DBUpdater\bin\x64\Release\
