@@ -1,6 +1,6 @@
 namespace hMailServer.Administrator
 {
-    partial class ucAccounts
+    partial class ucAccountsDialog
     {
         /// <summary> 
         /// Required designer variable.

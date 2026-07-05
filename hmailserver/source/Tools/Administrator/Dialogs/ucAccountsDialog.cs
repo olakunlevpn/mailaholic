@@ -11,11 +11,11 @@ using hMailServer.Shared;
 
 namespace hMailServer.Administrator
 {
-    public partial class ucAccounts : ucItemsView
+    public partial class ucAccountsDialog : ucItemsView
     {
         private int _domainID;
 
-        public ucAccounts(int domainID)
+        public ucAccountsDialog(int domainID)
         {
             InitializeComponent();
 

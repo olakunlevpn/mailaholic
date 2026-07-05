@@ -49,10 +49,13 @@ namespace hMailServer.Administrator
          return listAccounts;
       }
 
-      protected override void DeleteItem(ListViewItem item)
+      protected override void DeleteItems(List<ListViewItem> items)
       {
-         hMailServer.Account account = item.Tag as hMailServer.Account;
-         account.Delete();
+         foreach (ListViewItem item in items)
+         {
+            hMailServer.Account account = item.Tag as hMailServer.Account;
+            account.Delete();
+         }
       }
       
       protected override void AddItem()

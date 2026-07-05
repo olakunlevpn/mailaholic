@@ -46,7 +46,7 @@ namespace hMailServer.Administrator.Nodes
 
         public UserControl CreateControl()
         {
-            return new ucAccounts(_domainID);
+            return new ucAccountsDialog(_domainID);
         }
 
         public List<INode> SubNodes
