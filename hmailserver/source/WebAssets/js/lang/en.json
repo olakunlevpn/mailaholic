@@ -51,5 +51,39 @@
 
   "common.loading": "Loading...",
   "common.error": "An error occurred",
-  "common.retry": "Retry"
+  "common.retry": "Retry",
+
+  "admin.login.title": "Admin Login",
+  "admin.login.email": "Email",
+  "admin.login.password": "Password",
+  "admin.login.submit": "Sign In",
+  "admin.login.error": "Invalid credentials",
+  "admin.logout": "Logout",
+
+  "admin.nav.dashboard": "Dashboard",
+  "admin.nav.domains": "Domains",
+  "admin.nav.accounts": "Accounts",
+
+  "admin.dashboard.domains": "Domains",
+  "admin.dashboard.accounts": "Accounts",
+  "admin.dashboard.status": "Server Status",
+
+  "admin.domains.title": "Domains",
+  "admin.domains.add": "Add Domain",
+  "admin.domains.name": "Domain Name",
+  "admin.domains.status": "Status",
+  "admin.domains.actions": "Actions",
+  "admin.domains.confirmDelete": "Delete this domain?",
+
+  "admin.accounts.title": "Accounts",
+  "admin.accounts.add": "Add Account",
+  "admin.accounts.address": "Email Address",
+  "admin.accounts.password": "Password",
+  "admin.accounts.status": "Status",
+  "admin.accounts.actions": "Actions",
+  "admin.accounts.confirmDelete": "Delete this account?",
+
+  "admin.save": "Save",
+  "admin.cancel": "Cancel",
+  "admin.delete": "Delete"
 }
