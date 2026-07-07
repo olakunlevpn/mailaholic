@@ -168,6 +168,7 @@ EXIT 0
     <ClCompile Include="..\Common\WebAdmin\SetupApi.cpp" />
     <ClCompile Include="..\Common\WebAdmin\AuthApi.cpp" />
     <ClCompile Include="..\Common\WebAdmin\AdminApi.cpp" />
+    <ClCompile Include="..\Common\WebAdmin\LetsEncryptApi.cpp" />
     <ClCompile Include="..\Common\AntiSpam\AntiSpamConfiguration.cpp" />
     <ClCompile Include="..\Common\AntiSpam\DKIM\Canonicalization.cpp" />
     <ClCompile Include="..\Common\AntiSpam\DKIM\DKIM.cpp" />
@@ -666,6 +667,7 @@ EXIT 0
     <ClInclude Include="..\Common\WebAdmin\SetupApi.h" />
     <ClInclude Include="..\Common\WebAdmin\AuthApi.h" />
     <ClInclude Include="..\Common\WebAdmin\AdminApi.h" />
+    <ClInclude Include="..\Common\WebAdmin\LetsEncryptApi.h" />
     <ClInclude Include="..\Common\AntiSpam\AntiSpamConfiguration.h" />
     <ClInclude Include="..\Common\AntiSpam\DKIM\Canonicalization.h" />
     <ClInclude Include="..\Common\AntiSpam\DKIM\DKIM.h" />

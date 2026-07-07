@@ -11,6 +11,7 @@
 #include "SetupState.h"
 #include "AuthApi.h"
 #include "AdminApi.h"
+#include "LetsEncryptApi.h"
 #include "../Util/FileUtilities.h"
 #include "../Util/Unicode.h"
 #include "../Application/IniFileSettings.h"
@@ -141,6 +142,9 @@ namespace WebAdmin
 
       // Register admin API routes (always available, auth checked per endpoint)
       AdminApi::RegisterRoutes(*server_);
+
+      // Register Let's Encrypt API routes
+      LetsEncryptApi::RegisterRoutes(*server_);
 
       // Serve static assets
       server_->Get(".*", [](const httplib::Request& req, httplib::Response& res) {
