@@ -28,7 +28,6 @@
     window.App = {
         init: async function() {
             await Lang.load('en');
-            console.log('Mailaholic Web Admin loaded');
         }
     };
 
