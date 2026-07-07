@@ -9,8 +9,24 @@
 <body>
     <div id="app">
         <h1>Mailaholic</h1>
-        <p>Web Admin Loading...</p>
+        <p>Loading...</p>
     </div>
     <script src="js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            await App.init();
+            try {
+                var res = await fetch('/api/setup/state');
+                var data = await res.json();
+                if (data.success && !data.data.isComplete) {
+                    window.location.href = '/setup.html';
+                } else {
+                    document.getElementById('app').innerHTML = '<h1>Mailaholic Admin</h1><p>Coming in Phase 3...</p>';
+                }
+            } catch (e) {
+                document.getElementById('app').innerHTML = '<h1>Mailaholic</h1><p>Server not responding</p>';
+            }
+        });
+    </script>
 </body>
 </html>

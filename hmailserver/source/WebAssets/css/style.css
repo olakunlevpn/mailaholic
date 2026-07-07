@@ -24,3 +24,274 @@ h1 {
     margin-bottom: 1rem;
     color: #4dabf7;
 }
+
+/* Setup Wizard */
+.setup-wizard {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: left;
+}
+
+.wizard-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.wizard-header h1 {
+    font-size: 2rem;
+    color: #4dabf7;
+    margin-bottom: 1.5rem;
+}
+
+.progress-bar {
+    height: 4px;
+    background: #333;
+    border-radius: 2px;
+    margin-bottom: 1rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background: #4dabf7;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+.step-indicators {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.step-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #333;
+}
+
+.step-dot.active {
+    background: #4dabf7;
+}
+
+.wizard-content {
+    background: #252538;
+    border-radius: 8px;
+    padding: 2rem;
+}
+
+.step h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.step .subtitle {
+    color: #888;
+    margin-bottom: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.75rem;
+    background: #1a1a2e;
+    border: 1px solid #333;
+    border-radius: 4px;
+    color: #eee;
+    font-size: 1rem;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #4dabf7;
+}
+
+.form-group small {
+    display: block;
+    margin-top: 0.5rem;
+    color: #666;
+    font-size: 0.875rem;
+}
+
+.buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn.primary {
+    background: #4dabf7;
+    color: #000;
+}
+
+.btn.primary:hover {
+    background: #74c0fc;
+}
+
+.btn.secondary {
+    background: #333;
+    color: #eee;
+}
+
+.btn.secondary:hover {
+    background: #444;
+}
+
+.btn.outline {
+    background: transparent;
+    border: 1px solid #4dabf7;
+    color: #4dabf7;
+}
+
+.btn.outline:hover {
+    background: rgba(77, 171, 247, 0.1);
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Radio Cards */
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.radio-card {
+    display: block;
+    padding: 1rem;
+    background: #1a1a2e;
+    border: 2px solid #333;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.radio-card:hover {
+    border-color: #4dabf7;
+}
+
+.radio-card.selected {
+    border-color: #4dabf7;
+    background: rgba(77, 171, 247, 0.1);
+}
+
+.radio-card input {
+    display: none;
+}
+
+.radio-card .title {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.radio-card .desc {
+    display: block;
+    color: #888;
+    font-size: 0.875rem;
+}
+
+/* Check List */
+.check-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.check-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: #1a1a2e;
+    border-radius: 4px;
+}
+
+.check-item .icon {
+    font-size: 1.25rem;
+}
+
+.check-item.ok .icon { color: #51cf66; }
+.check-item.warn .icon { color: #fcc419; }
+.check-item.error .icon { color: #ff6b6b; }
+.check-item.loading .icon { color: #888; }
+
+/* DNS Records */
+.dns-records {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.dns-record {
+    display: grid;
+    grid-template-columns: 60px 1fr 2fr;
+    gap: 0.5rem;
+    align-items: center;
+    padding: 0.75rem;
+    background: #1a1a2e;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.875rem;
+}
+
+.dns-record .type {
+    color: #4dabf7;
+    font-weight: 600;
+}
+
+.dns-record .value {
+    word-break: break-all;
+}
+
+/* Done Step */
+.step.done {
+    text-align: center;
+}
+
+.success-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    background: #51cf66;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: #fff;
+}
+
+.step.done .buttons {
+    justify-content: center;
+}
+
+.loading {
+    color: #888;
+    text-align: center;
+    padding: 1rem;
+}
