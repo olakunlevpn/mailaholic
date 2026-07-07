@@ -7,6 +7,8 @@
 #include "httplib.h"
 #include "WebServer.h"
 #include "AssetHandler.h"
+#include "SetupApi.h"
+#include "SetupState.h"
 #include "../Util/FileUtilities.h"
 #include "../Util/Unicode.h"
 #include "../Application/IniFileSettings.h"
@@ -125,6 +127,12 @@ namespace WebAdmin
 
       if (!server_->is_valid())
          return false;
+
+      // Register setup API routes if setup not complete
+      if (!SetupState::Instance().IsComplete())
+      {
+         SetupApi::RegisterRoutes(*server_);
+      }
 
       // Serve static assets
       server_->Get(".*", [](const httplib::Request& req, httplib::Response& res) {
