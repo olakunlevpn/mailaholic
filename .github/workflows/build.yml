@@ -90,6 +90,10 @@ jobs:
           perl build.pl Release libpq
           if errorlevel 1 exit /b 1
 
+      - name: Embed web assets
+        shell: pwsh
+        run: ./build/embed-assets.ps1
+
       - name: Build Mailaholic
         shell: pwsh
         run: ./build/build.ps1 -Configuration Release

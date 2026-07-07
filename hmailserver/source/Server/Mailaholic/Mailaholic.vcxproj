@@ -653,6 +653,7 @@ EXIT 0
   <ItemGroup>
     <ClInclude Include="..\Common\WebAdmin\httplib.h" />
     <ClInclude Include="..\Common\WebAdmin\WebServer.h" />
+    <ClInclude Include="..\Common\WebAdmin\EmbeddedAssets.h" />
     <ClInclude Include="..\Common\AntiSpam\AntiSpamConfiguration.h" />
     <ClInclude Include="..\Common\AntiSpam\DKIM\Canonicalization.h" />
     <ClInclude Include="..\Common\AntiSpam\DKIM\DKIM.h" />
