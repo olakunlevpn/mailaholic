@@ -1,18 +1,18 @@
 #include "stdafx.h"
-#include "SessionManager.h"
+#include "WebSessionManager.h"
 #include <random>
 #include <sstream>
 #include <iomanip>
 
 namespace WebAdmin
 {
-   SessionManager& SessionManager::Instance()
+   WebSessionManager& WebSessionManager::Instance()
    {
-      static SessionManager instance;
+      static WebSessionManager instance;
       return instance;
    }
 
-   std::string SessionManager::GenerateToken()
+   std::string WebSessionManager::GenerateToken()
    {
       std::random_device rd;
       std::mt19937_64 gen(rd());
@@ -25,7 +25,7 @@ namespace WebAdmin
       return oss.str();
    }
 
-   std::string SessionManager::CreateSession(int userId)
+   std::string WebSessionManager::CreateSession(int userId)
    {
       std::lock_guard<std::mutex> lock(mutex_);
 
@@ -37,7 +37,7 @@ namespace WebAdmin
       return token;
    }
 
-   int SessionManager::ValidateSession(const std::string& token)
+   int WebSessionManager::ValidateSession(const std::string& token)
    {
       std::lock_guard<std::mutex> lock(mutex_);
 
@@ -54,13 +54,13 @@ namespace WebAdmin
       return it->second.userId;
    }
 
-   void SessionManager::InvalidateSession(const std::string& token)
+   void WebSessionManager::InvalidateSession(const std::string& token)
    {
       std::lock_guard<std::mutex> lock(mutex_);
       sessions_.erase(token);
    }
 
-   void SessionManager::CleanupExpired()
+   void WebSessionManager::CleanupExpired()
    {
       std::lock_guard<std::mutex> lock(mutex_);
       auto now = std::chrono::steady_clock::now();

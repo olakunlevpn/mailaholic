@@ -7,10 +7,10 @@
 
 namespace WebAdmin
 {
-   class SessionManager
+   class WebSessionManager
    {
    public:
-      static SessionManager& Instance();
+      static WebSessionManager& Instance();
 
       std::string CreateSession(int userId);
       int ValidateSession(const std::string& token);
@@ -18,7 +18,7 @@ namespace WebAdmin
       void CleanupExpired();
 
    private:
-      SessionManager() = default;
+      WebSessionManager() = default;
       std::string GenerateToken();
 
       struct Session

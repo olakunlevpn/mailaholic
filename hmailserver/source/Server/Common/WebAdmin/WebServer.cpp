@@ -9,6 +9,7 @@
 #include "AssetHandler.h"
 #include "SetupApi.h"
 #include "SetupState.h"
+#include "AuthApi.h"
 #include "../Util/FileUtilities.h"
 #include "../Util/Unicode.h"
 #include "../Application/IniFileSettings.h"
@@ -133,6 +134,9 @@ namespace WebAdmin
       {
          SetupApi::RegisterRoutes(*server_);
       }
+
+      // Register auth API routes (always available)
+      AuthApi::RegisterRoutes(*server_);
 
       // Serve static assets
       server_->Get(".*", [](const httplib::Request& req, httplib::Response& res) {
