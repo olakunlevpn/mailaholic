@@ -103,7 +103,8 @@
             sidebar.innerHTML =
                 '<div class="sidebar-header"><h1>Mailaholic</h1></div>' +
                 '<a href="#dashboard" class="nav-item" data-page="dashboard">' + Lang.get('admin.nav.dashboard') + '</a>' +
-                '<a href="#domains" class="nav-item" data-page="domains">' + Lang.get('admin.nav.domains') + '</a>';
+                '<a href="#domains" class="nav-item" data-page="domains">' + Lang.get('admin.nav.domains') + '</a>' +
+                '<a href="#settings" class="nav-item" data-page="settings">' + Lang.get('admin.nav.settings') + '</a>';
 
             var topbar = document.getElementById('topbar');
             topbar.innerHTML =
@@ -133,6 +134,9 @@
                     break;
                 case 'domains':
                     this.loadDomains();
+                    break;
+                case 'settings':
+                    this.loadSettings();
                     break;
                 default:
                     if (page.startsWith('accounts/')) {
@@ -375,6 +379,97 @@
                 await this.api('/api/accounts/' + id, 'DELETE');
                 this.loadAccounts(domainId);
             }
+        },
+
+        loadSettings: async function() {
+            var self = this;
+            document.getElementById('page-title').textContent = Lang.get('admin.nav.settings');
+
+            var content = document.getElementById('page-content');
+            content.innerHTML = '<div class="loading">' + Lang.get('common.loading') + '</div>';
+
+            var data = await this.api('/api/settings');
+
+            if (data.success) {
+                var s = data.data;
+                var html =
+                    '<div class="card">' +
+                        '<div class="card-header">' +
+                            '<span class="card-title">' + Lang.get('admin.settings.smtp') + '</span>' +
+                        '</div>' +
+                        '<div class="form-group">' +
+                            '<label><input type="checkbox" id="smtp-enabled" ' + (s.smtp.enabled ? 'checked' : '') + '> ' + Lang.get('admin.settings.enabled') + '</label>' +
+                        '</div>' +
+                        '<div class="form-group">' +
+                            '<label>' + Lang.get('admin.settings.maxMessageSize') + '</label>' +
+                            '<input type="number" id="smtp-maxsize" value="' + s.smtp.maxMessageSize + '">' +
+                        '</div>' +
+                        '<div class="form-group">' +
+                            '<label>' + Lang.get('admin.settings.maxRecipients') + '</label>' +
+                            '<input type="number" id="smtp-maxrecipients" value="' + s.smtp.maxRecipients + '">' +
+                        '</div>' +
+                        '<div class="buttons">' +
+                            '<button class="btn primary" id="save-smtp">' + Lang.get('admin.save') + '</button>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="card">' +
+                        '<div class="card-header">' +
+                            '<span class="card-title">' + Lang.get('admin.settings.logging') + '</span>' +
+                        '</div>' +
+                        '<div class="form-group">' +
+                            '<label><input type="checkbox" id="log-enabled" ' + (s.logging.enabled ? 'checked' : '') + '> ' + Lang.get('admin.settings.enabled') + '</label>' +
+                        '</div>' +
+                        '<div class="form-group">' +
+                            '<label><input type="checkbox" id="log-smtp" ' + (s.logging.logSMTP ? 'checked' : '') + '> ' + Lang.get('admin.settings.logSMTP') + '</label>' +
+                        '</div>' +
+                        '<div class="form-group">' +
+                            '<label><input type="checkbox" id="log-pop3" ' + (s.logging.logPOP3 ? 'checked' : '') + '> ' + Lang.get('admin.settings.logPOP3') + '</label>' +
+                        '</div>' +
+                        '<div class="form-group">' +
+                            '<label><input type="checkbox" id="log-imap" ' + (s.logging.logIMAP ? 'checked' : '') + '> ' + Lang.get('admin.settings.logIMAP') + '</label>' +
+                        '</div>' +
+                        '<div class="form-group">' +
+                            '<label><input type="checkbox" id="log-debug" ' + (s.logging.logDebug ? 'checked' : '') + '> ' + Lang.get('admin.settings.logDebug') + '</label>' +
+                        '</div>' +
+                        '<div class="buttons">' +
+                            '<button class="btn primary" id="save-logging">' + Lang.get('admin.save') + '</button>' +
+                        '</div>' +
+                    '</div>';
+
+                content.innerHTML = html;
+
+                document.getElementById('save-smtp').addEventListener('click', function() {
+                    self.saveSmtpSettings();
+                });
+
+                document.getElementById('save-logging').addEventListener('click', function() {
+                    self.saveLoggingSettings();
+                });
+            }
+        },
+
+        saveSmtpSettings: async function() {
+            var settings = {
+                enabled: document.getElementById('smtp-enabled').checked,
+                maxMessageSize: parseInt(document.getElementById('smtp-maxsize').value),
+                maxRecipients: parseInt(document.getElementById('smtp-maxrecipients').value)
+            };
+
+            await this.api('/api/settings/smtp', 'PUT', settings);
+            alert(Lang.get('admin.settings.saved'));
+        },
+
+        saveLoggingSettings: async function() {
+            var settings = {
+                enabled: document.getElementById('log-enabled').checked,
+                logSMTP: document.getElementById('log-smtp').checked,
+                logPOP3: document.getElementById('log-pop3').checked,
+                logIMAP: document.getElementById('log-imap').checked,
+                logDebug: document.getElementById('log-debug').checked
+            };
+
+            await this.api('/api/settings/logging', 'PUT', settings);
+            alert(Lang.get('admin.settings.saved'));
         }
     };
 

@@ -27,6 +27,11 @@ namespace WebAdmin
       // Dashboard
       static void GetDashboard(const httplib::Request& req, httplib::Response& res);
 
+      // Settings
+      static void GetSettings(const httplib::Request& req, httplib::Response& res);
+      static void UpdateSmtpSettings(const httplib::Request& req, httplib::Response& res);
+      static void UpdateLoggingSettings(const httplib::Request& req, httplib::Response& res);
+
       static std::string JsonError(const std::string& message);
       static std::string JsonSuccess(const std::string& data = "{}");
    };

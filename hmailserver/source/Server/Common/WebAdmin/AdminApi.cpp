@@ -9,6 +9,8 @@
 #include "../Persistence/PersistentAccount.h"
 #include "../Util/Crypt.h"
 #include "../Util/Unicode.h"
+#include "../Application/Configuration.h"
+#include "../../SMTP/SMTPConfiguration.h"
 #include <sstream>
 
 namespace WebAdmin
@@ -39,6 +41,11 @@ namespace WebAdmin
 
       // Dashboard
       server.Get("/api/dashboard", GetDashboard);
+
+      // Settings
+      server.Get("/api/settings", GetSettings);
+      server.Put("/api/settings/smtp", UpdateSmtpSettings);
+      server.Put("/api/settings/logging", UpdateLoggingSettings);
    }
 
    void AdminApi::ListDomains(const httplib::Request& req, httplib::Response& res)
@@ -367,5 +374,122 @@ namespace WebAdmin
       json << "}";
 
       res.set_content(JsonSuccess(json.str()), "application/json");
+   }
+
+   void AdminApi::GetSettings(const httplib::Request& req, httplib::Response& res)
+   {
+      if (!AuthApi::RequireAuth(req, res)) return;
+
+      auto config = MA::Configuration::Instance();
+      auto smtpConfig = config->GetSMTPConfiguration();
+
+      std::ostringstream json;
+      json << "{";
+
+      // SMTP settings
+      json << "\"smtp\":{";
+      json << "\"enabled\":" << (config->GetUseSMTP() ? "true" : "false") << ",";
+      json << "\"maxMessageSize\":" << smtpConfig->GetMaxMessageSize() << ",";
+      json << "\"maxRecipients\":" << smtpConfig->GetMaxSMTPRecipientsInBatch();
+      json << "},";
+
+      // Logging settings
+      json << "\"logging\":{";
+      json << "\"enabled\":" << (config->GetUseLogging() ? "true" : "false") << ",";
+      json << "\"logSMTP\":" << (config->GetLogSMTPConversations() ? "true" : "false") << ",";
+      json << "\"logPOP3\":" << (config->GetLogPOP3Conversations() ? "true" : "false") << ",";
+      json << "\"logIMAP\":" << (config->GetLogIMAPConversations() ? "true" : "false") << ",";
+      json << "\"logDebug\":" << (config->GetLogDebug() ? "true" : "false");
+      json << "}";
+
+      json << "}";
+      res.set_content(JsonSuccess(json.str()), "application/json");
+   }
+
+   void AdminApi::UpdateSmtpSettings(const httplib::Request& req, httplib::Response& res)
+   {
+      if (!AuthApi::RequireAuth(req, res)) return;
+
+      auto config = MA::Configuration::Instance();
+      auto smtpConfig = config->GetSMTPConfiguration();
+      std::string body = req.body;
+
+      // Parse enabled
+      size_t pos = body.find("\"enabled\"");
+      if (pos != std::string::npos)
+      {
+         bool enabled = body.find("true", pos) != std::string::npos;
+         config->SetUseSMTP(enabled);
+      }
+
+      // Parse maxMessageSize
+      pos = body.find("\"maxMessageSize\"");
+      if (pos != std::string::npos)
+      {
+         size_t start = body.find(":", pos) + 1;
+         int size = std::stoi(body.substr(start));
+         smtpConfig->SetMaxMessageSize(size);
+      }
+
+      // Parse maxRecipients
+      pos = body.find("\"maxRecipients\"");
+      if (pos != std::string::npos)
+      {
+         size_t start = body.find(":", pos) + 1;
+         int count = std::stoi(body.substr(start));
+         smtpConfig->SetMaxSMTPRecipientsInBatch(count);
+      }
+
+      res.set_content(JsonSuccess("{}"), "application/json");
+   }
+
+   void AdminApi::UpdateLoggingSettings(const httplib::Request& req, httplib::Response& res)
+   {
+      if (!AuthApi::RequireAuth(req, res)) return;
+
+      auto config = MA::Configuration::Instance();
+      std::string body = req.body;
+
+      // Parse enabled
+      size_t pos = body.find("\"enabled\"");
+      if (pos != std::string::npos)
+      {
+         bool enabled = body.find("true", pos) != std::string::npos;
+         config->SetUseLogging(enabled);
+      }
+
+      // Parse logSMTP
+      pos = body.find("\"logSMTP\"");
+      if (pos != std::string::npos)
+      {
+         bool val = body.find("true", pos) != std::string::npos;
+         config->SetLogSMTPConversations(val);
+      }
+
+      // Parse logPOP3
+      pos = body.find("\"logPOP3\"");
+      if (pos != std::string::npos)
+      {
+         bool val = body.find("true", pos) != std::string::npos;
+         config->SetLogPOP3Conversations(val);
+      }
+
+      // Parse logIMAP
+      pos = body.find("\"logIMAP\"");
+      if (pos != std::string::npos)
+      {
+         bool val = body.find("true", pos) != std::string::npos;
+         config->SetLogIMAPConversations(val);
+      }
+
+      // Parse logDebug
+      pos = body.find("\"logDebug\"");
+      if (pos != std::string::npos)
+      {
+         bool val = body.find("true", pos) != std::string::npos;
+         config->SetLogDebug(val);
+      }
+
+      res.set_content(JsonSuccess("{}"), "application/json");
    }
 }

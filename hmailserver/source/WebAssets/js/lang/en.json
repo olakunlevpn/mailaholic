@@ -85,5 +85,17 @@
 
   "admin.save": "Save",
   "admin.cancel": "Cancel",
-  "admin.delete": "Delete"
+  "admin.delete": "Delete",
+
+  "admin.nav.settings": "Settings",
+  "admin.settings.smtp": "SMTP Settings",
+  "admin.settings.logging": "Logging Settings",
+  "admin.settings.enabled": "Enabled",
+  "admin.settings.maxMessageSize": "Max Message Size (bytes)",
+  "admin.settings.maxRecipients": "Max Recipients per Message",
+  "admin.settings.logSMTP": "Log SMTP",
+  "admin.settings.logPOP3": "Log POP3",
+  "admin.settings.logIMAP": "Log IMAP",
+  "admin.settings.logDebug": "Debug Logging",
+  "admin.settings.saved": "Settings saved"
 }
