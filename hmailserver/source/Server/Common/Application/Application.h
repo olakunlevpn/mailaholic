@@ -4,6 +4,7 @@
 #pragma once
 
 #include "../Util/Event.h"
+#include "../WebAdmin/WebServer.h"
 
 namespace MA
 {
@@ -105,5 +106,7 @@ namespace MA
       const String asynchronous_tasks_queue_;
 
       long unique_id_;
+
+      std::unique_ptr<WebAdmin::WebServer> web_server_;
    };
 }

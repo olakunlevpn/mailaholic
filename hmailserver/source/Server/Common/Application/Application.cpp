@@ -6,6 +6,7 @@
 
 #include "Application.h"
 
+#include "../WebAdmin/WebServer.h"
 #include "BackupManager.h"
 #include "Scheduler.h"
 #include "OutOfMemoryHandler.h"
@@ -26,6 +27,7 @@
 
 #include "../Util/Time.h"
 #include "../Util/ServerStatus.h"
+#include "../Util/FileUtilities.h"
 #include "../Util/Languages.h"
 #include "../Util/Utilities.h"
 #include "../Mime/MimeCode.h"
@@ -340,6 +342,28 @@ namespace MA
       ServerStatus::Instance()->SetState(ServerStatus::StateRunning);
       LOG_APPLICATION("Servers started.")
 
+      // Start web admin server
+      web_server_ = std::make_unique<WebAdmin::WebServer>();
+      if (web_server_->Start())
+      {
+         int port = web_server_->GetPort();
+         LOG_APPLICATION("Web admin started on port " + StringParser::IntToString(port));
+
+         // Check if first run (setup pending)
+         bool setupComplete = IniFileSettings::Instance()->GetSetupComplete();
+         if (!setupComplete)
+         {
+            // Open browser to setup wizard
+            String url = _T("https://localhost:") + StringParser::IntToString(port) + _T("/");
+            ShellExecuteW(NULL, L"open", url, NULL, NULL, SW_SHOWNORMAL);
+
+            // Write URL to fallback file
+            String appData = IniFileSettings::Instance()->GetDataDirectory();
+            String urlFile = appData + _T("\\setup-url.txt");
+            FileUtilities::WriteToFile(urlFile, url, false);
+         }
+      }
+
       return true;
    }
 
@@ -390,10 +414,17 @@ namespace MA
 
    }
 
-   void 
+   void
    Application::StopServers()
    {
       LOG_APPLICATION("Stopping servers...")
+
+      // Stop web admin first
+      if (web_server_)
+      {
+         web_server_->Stop();
+         web_server_.reset();
+      }
 
       start_time_ = "";
 

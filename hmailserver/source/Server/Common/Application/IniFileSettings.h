@@ -120,6 +120,9 @@ namespace MA
       String GetDNSServer() const { return dns_server_; }
       std::set<int> GetAuthDisabledOnPorts();
 
+      bool GetSetupComplete();
+      void SetSetupComplete(bool value);
+
    private:   
 
       void WriteIniSetting_(const String &sSection, const String &sKey, const String &sValue);

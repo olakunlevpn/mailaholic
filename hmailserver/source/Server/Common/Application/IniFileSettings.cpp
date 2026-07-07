@@ -621,4 +621,16 @@ namespace MA
 
       return authDisabledOnPorts;
    }
+
+   bool
+   IniFileSettings::GetSetupComplete()
+   {
+      return ReadIniSettingInteger_("Setup", "Complete", 0) == 1;
+   }
+
+   void
+   IniFileSettings::SetSetupComplete(bool value)
+   {
+      WriteIniSetting_("Setup", "Complete", value ? 1 : 0);
+   }
 }
