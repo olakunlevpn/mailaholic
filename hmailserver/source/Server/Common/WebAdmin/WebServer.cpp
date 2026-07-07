@@ -12,6 +12,7 @@
 #include "AuthApi.h"
 #include "AdminApi.h"
 #include "LetsEncryptApi.h"
+#include "DKIMApi.h"
 #include "../Util/FileUtilities.h"
 #include "../Util/Unicode.h"
 #include "../Application/IniFileSettings.h"
@@ -145,6 +146,9 @@ namespace WebAdmin
 
       // Register Let's Encrypt API routes
       LetsEncryptApi::RegisterRoutes(*server_);
+
+      // Register DKIM API routes
+      DKIMApi::RegisterRoutes(*server_);
 
       // Serve static assets
       server_->Get(".*", [](const httplib::Request& req, httplib::Response& res) {
