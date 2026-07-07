@@ -2,6 +2,13 @@
 #include "SetupApi.h"
 #include "SetupState.h"
 #include "../Application/IniFileSettings.h"
+#include "../BO/Domain.h"
+#include "../BO/Account.h"
+#include "../Persistence/PersistentDomain.h"
+#include "../Persistence/PersistentAccount.h"
+#include "../Persistence/PersistenceMode.h"
+#include "../Util/Crypt.h"
+#include "../Util/Unicode.h"
 #include <sstream>
 
 namespace WebAdmin
@@ -176,6 +183,49 @@ namespace WebAdmin
    void SetupApi::Complete(const httplib::Request& req, httplib::Response& res)
    {
       auto& state = SetupState::Instance();
+
+      // Extract domain from admin email
+      std::string adminEmail = state.GetAdminEmail();
+      std::string adminPassword = state.GetAdminPassword();
+
+      size_t atPos = adminEmail.find("@");
+      if (atPos == std::string::npos)
+      {
+         res.status = 400;
+         res.set_content(JsonError("Invalid admin email"), "application/json");
+         return;
+      }
+
+      std::string domainName = adminEmail.substr(atPos + 1);
+
+      // Create domain
+      auto domain = std::make_shared<MA::Domain>();
+      domain->SetName(MA::String(domainName.c_str()));
+      domain->SetIsActive(true);
+
+      if (!MA::PersistentDomain::SaveObject(domain))
+      {
+         res.status = 500;
+         res.set_content(JsonError("Failed to create domain"), "application/json");
+         return;
+      }
+
+      // Create admin account
+      auto account = std::make_shared<MA::Account>();
+      account->SetDomainID(domain->GetID());
+      account->SetAddress(MA::String(adminEmail.c_str()));
+      account->SetPassword(MA::Crypt::Instance()->EnCrypt(MA::String(adminPassword.c_str()), MA::Crypt::ETSHA256));
+      account->SetActive(true);
+      account->SetAdminLevel(MA::Account::ServerAdmin);
+
+      MA::String errorMsg;
+      if (!MA::PersistentAccount::SaveObject(account, errorMsg, MA::PersistenceModeNormal))
+      {
+         res.status = 500;
+         res.set_content(JsonError("Failed to create admin account"), "application/json");
+         return;
+      }
+
       state.MarkComplete();
       res.set_content(JsonSuccess("{}"), "application/json");
    }
