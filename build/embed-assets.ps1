@@ -1,5 +1,5 @@
 # embed-assets.ps1
-# Converts WebAssets folder to C++ header with gzipped byte arrays
+# Converts WebAssets folder to C++ header with raw byte arrays
 
 param(
     [string]$InputDir = "hmailserver/source/WebAssets",
@@ -7,15 +7,6 @@ param(
 )
 
 $assets = @{}
-
-function Compress-ToGzip {
-    param([byte[]]$Data)
-    $ms = New-Object System.IO.MemoryStream
-    $gz = New-Object System.IO.Compression.GZipStream($ms, [System.IO.Compression.CompressionMode]::Compress)
-    $gz.Write($Data, 0, $Data.Length)
-    $gz.Close()
-    return $ms.ToArray()
-}
 
 function Convert-ToHexArray {
     param([byte[]]$Data)
@@ -43,14 +34,12 @@ $assetPaths = @()
 Get-ChildItem -Path $InputDir -Recurse -File | ForEach-Object {
     $relativePath = $_.FullName.Substring((Resolve-Path $InputDir).Path.Length + 1).Replace("\", "/")
     $content = [System.IO.File]::ReadAllBytes($_.FullName)
-    $compressed = Compress-ToGzip -Data $content
     $assets[$relativePath] = @{
-        Data = $compressed
-        Size = $compressed.Length
-        OriginalSize = $content.Length
+        Data = $content
+        Size = $content.Length
     }
     $assetPaths += $relativePath
-    Write-Host "Embedded: $relativePath ($($content.Length) -> $($compressed.Length) bytes)"
+    Write-Host "Embedded: $relativePath ($($content.Length) bytes)"
 }
 
 # Sort paths for consistent ordering
@@ -62,7 +51,6 @@ $header = @"
 #pragma once
 
 #include <string>
-#include <vector>
 #include <unordered_map>
 
 namespace WebAdmin
@@ -70,8 +58,7 @@ namespace WebAdmin
    struct Asset
    {
       const unsigned char* data;
-      size_t compressedSize;
-      size_t originalSize;
+      size_t size;
       const char* mimeType;
    };
 
@@ -111,7 +98,7 @@ foreach ($path in $assetPaths) {
     elseif ($path.EndsWith(".svg")) { $mimeType = "image/svg+xml" }
     elseif ($path.EndsWith(".ico")) { $mimeType = "image/x-icon" }
 
-    $header += "         {`"$path`", {$varName, $($asset.Size), $($asset.OriginalSize), `"$mimeType`"}},`r`n"
+    $header += "         {`"$path`", {$varName, $($asset.Size), `"$mimeType`"}},`r`n"
     $assetIndex++
 }
 
@@ -120,7 +107,7 @@ $header += @"
       return assets;
    }
 
-   inline bool GetAsset(const std::string& path, const unsigned char*& data, size_t& compressedSize, size_t& originalSize, const char*& mimeType)
+   inline bool GetAsset(const std::string& path, const unsigned char*& data, size_t& size, const char*& mimeType)
    {
       auto& assets = GetAssetMap();
       auto it = assets.find(path);
@@ -128,8 +115,7 @@ $header += @"
          return false;
 
       data = it->second.data;
-      compressedSize = it->second.compressedSize;
-      originalSize = it->second.originalSize;
+      size = it->second.size;
       mimeType = it->second.mimeType;
       return true;
    }

@@ -162,6 +162,7 @@ EXIT 0
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Common\WebAdmin\WebServer.cpp" />
+    <ClCompile Include="..\Common\WebAdmin\AssetHandler.cpp" />
     <ClCompile Include="..\Common\AntiSpam\AntiSpamConfiguration.cpp" />
     <ClCompile Include="..\Common\AntiSpam\DKIM\Canonicalization.cpp" />
     <ClCompile Include="..\Common\AntiSpam\DKIM\DKIM.cpp" />
@@ -654,6 +655,7 @@ EXIT 0
     <ClInclude Include="..\Common\WebAdmin\httplib.h" />
     <ClInclude Include="..\Common\WebAdmin\WebServer.h" />
     <ClInclude Include="..\Common\WebAdmin\EmbeddedAssets.h" />
+    <ClInclude Include="..\Common\WebAdmin\AssetHandler.h" />
     <ClInclude Include="..\Common\AntiSpam\AntiSpamConfiguration.h" />
     <ClInclude Include="..\Common\AntiSpam\DKIM\Canonicalization.h" />
     <ClInclude Include="..\Common\AntiSpam\DKIM\DKIM.h" />

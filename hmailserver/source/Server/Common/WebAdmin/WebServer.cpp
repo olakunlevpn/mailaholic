@@ -6,6 +6,7 @@
 #define CPPHTTPLIB_OPENSSL_SUPPORT
 #include "httplib.h"
 #include "WebServer.h"
+#include "AssetHandler.h"
 #include "../Util/FileUtilities.h"
 #include "../Util/Unicode.h"
 #include "../Application/IniFileSettings.h"
@@ -124,6 +125,22 @@ namespace WebAdmin
 
       if (!server_->is_valid())
          return false;
+
+      // Serve static assets
+      server_->Get(".*", [](const httplib::Request& req, httplib::Response& res) {
+         std::string content, mimeType;
+         bool isCompressed;
+
+         if (AssetHandler::ServeAsset(req.path, content, mimeType, isCompressed))
+         {
+            res.set_content(content, mimeType.c_str());
+         }
+         else
+         {
+            res.status = 404;
+            res.set_content("Not Found", "text/plain");
+         }
+      });
 
       running_ = true;
       serverThread_ = std::thread([this]() {
