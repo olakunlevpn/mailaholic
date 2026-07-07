@@ -1,9 +1,13 @@
 #include "stdafx.h"
 
+#include <winsock2.h>
+#include <ws2tcpip.h>
+
 #define CPPHTTPLIB_OPENSSL_SUPPORT
 #include "httplib.h"
 #include "WebServer.h"
 #include "../Util/FileUtilities.h"
+#include "../Util/Unicode.h"
 #include "../Application/IniFileSettings.h"
 #include <openssl/evp.h>
 #include <openssl/pem.h>
@@ -52,11 +56,13 @@ namespace WebAdmin
    bool WebServer::GenerateSelfSignedCert()
    {
       MA::String dataDir = MA::IniFileSettings::Instance()->GetDataDirectory();
-      certPath_ = MA::String(dataDir + _T("\\webadmin.crt")).ToStdString();
-      keyPath_ = MA::String(dataDir + _T("\\webadmin.key")).ToStdString();
+      MA::String certPathW = dataDir + _T("\\webadmin.crt");
+      MA::String keyPathW = dataDir + _T("\\webadmin.key");
+      certPath_ = MA::Unicode::ToANSI(certPathW).c_str();
+      keyPath_ = MA::Unicode::ToANSI(keyPathW).c_str();
 
-      if (MA::FileUtilities::Exists(MA::String(certPath_)) &&
-          MA::FileUtilities::Exists(MA::String(keyPath_)))
+      if (MA::FileUtilities::Exists(certPathW) &&
+          MA::FileUtilities::Exists(keyPathW))
       {
          return true;
       }
@@ -83,15 +89,15 @@ namespace WebAdmin
       X509_set_issuer_name(x509, name);
       X509_sign(x509, pkey, EVP_sha256());
 
-      FILE* certFile = fopen(certPath_.c_str(), "wb");
-      if (certFile)
+      FILE* certFile = nullptr;
+      if (fopen_s(&certFile, certPath_.c_str(), "wb") == 0 && certFile)
       {
          PEM_write_X509(certFile, x509);
          fclose(certFile);
       }
 
-      FILE* keyFile = fopen(keyPath_.c_str(), "wb");
-      if (keyFile)
+      FILE* keyFile = nullptr;
+      if (fopen_s(&keyFile, keyPath_.c_str(), "wb") == 0 && keyFile)
       {
          PEM_write_PrivateKey(keyFile, pkey, nullptr, nullptr, 0, nullptr, nullptr);
          fclose(keyFile);
