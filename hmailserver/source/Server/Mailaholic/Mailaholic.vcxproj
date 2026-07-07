@@ -161,6 +161,7 @@ EXIT 0
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Common\WebAdmin\WebServer.cpp" />
     <ClCompile Include="..\Common\AntiSpam\AntiSpamConfiguration.cpp" />
     <ClCompile Include="..\Common\AntiSpam\DKIM\Canonicalization.cpp" />
     <ClCompile Include="..\Common\AntiSpam\DKIM\DKIM.cpp" />
@@ -651,6 +652,7 @@ EXIT 0
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Common\WebAdmin\httplib.h" />
+    <ClInclude Include="..\Common\WebAdmin\WebServer.h" />
     <ClInclude Include="..\Common\AntiSpam\AntiSpamConfiguration.h" />
     <ClInclude Include="..\Common\AntiSpam\DKIM\Canonicalization.h" />
     <ClInclude Include="..\Common\AntiSpam\DKIM\DKIM.h" />
